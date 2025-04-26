@@ -8,6 +8,8 @@ const config = {
 	// for more information about preprocessors
 	preprocess: sveltePreprocess({
 		// Defaults should handle lang="civet"
+		civet: { sync: true }
+
 	}),
 
 	kit: {

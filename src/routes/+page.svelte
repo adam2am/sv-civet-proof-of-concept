@@ -1,5 +1,5 @@
 <script lang="civet">
-	message := "Hello Civet!"
+	message := "!"
 </script>
 
 <div class="container">

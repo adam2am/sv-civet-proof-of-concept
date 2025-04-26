@@ -1,7 +1,7 @@
-<script lang="ts">
+<script lang="civet">
 	// with global.d.ts = modules are not dynamicly detected, without it = import error
 	import { ImportedClass } from './class.svelte.civet';
-	const importedClass = new ImportedClass(0);
+	importedClass := new ImportedClass(0);
 </script>
 
 

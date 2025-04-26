@@ -1,0 +1,39 @@
+// src/routes/page-check.svelte.ts
+
+type PageCheck = {
+  message: string;
+  timestamp?: Date;
+  status?: 'pending' | 'completed' | 'failed';
+}
+
+// State class for managing page check data using Svelte 5 runes
+export class PageCheckClass implements PageCheck {
+  // Apply $state to each property
+  message = $state<string>('');
+  timestamp = $state<Date | undefined>(undefined);
+  status = $state<'pending' | 'completed' | 'failed'>('pending');
+
+  constructor(message: string = 'Default page check message') {
+    this.message = message;
+    this.timestamp = new Date();
+  }
+
+  // Updates the message state
+  private setMessage(message: string): void {
+    this.message = message;
+  }
+
+  // Updates the status of the page check
+  public updateStatus(status: 'pending' | 'completed' | 'failed'): void {
+    this.status = status;
+    this.timestamp = new Date();
+  }
+
+  // Completes the page check with an optional result message
+  public completeCheck(resultMessage?: string): void {
+    if (resultMessage) {
+      this.setMessage(resultMessage);
+    }
+    this.updateStatus('completed');
+  }
+}

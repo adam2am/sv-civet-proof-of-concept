@@ -1,7 +1,7 @@
 <script lang="ts">
-	
-	import { ImportedClass23 } from './class.svelte.civet';
-	const importedClass = new ImportedClass23(0);
+	// with global.d.ts = modules are not dynamicly detected, without it = import error
+	import { ImportedClass } from './class.svelte.civet';
+	const importedClass = new ImportedClass(0);
 </script>
 
 
@@ -12,7 +12,7 @@
 	</p>
 	<p class="description">which provides the functionality for the button below</p>
 
-
+	
 	<div class="status-box">
 		<h2>Button Tracker Status</h2>
 		<p>Count: {importedClass.count}</p>
@@ -22,6 +22,7 @@
 			on:click={() => importedClass.press()}>
 			Press Me
 		</button>
+		{importedClass.hello}
 	</div>
 </div>
 

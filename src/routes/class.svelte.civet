@@ -1,54 +1,41 @@
 // src/routes/class.svelte.civet
-type classSchema = {
-  count: number;
-  lastTimePressed?: Date | null;
-  hasBeenPressed: boolean;
-}
+type classSchema 
+	count: number
+	lastTimePressed: Date | null
+	hasBeenPressed: boolean
 
 
 /* A class to track button press state using Svelte 5 runes */
-export class ImportedClass23 implements classSchema {
+export class ImportedClass implements classSchema {
 	// Track the number of times the button was pressed
-	count = $state<number>(0);
-	lastTimePressed = $state<Date | null>(null);
-	hasBeenPressed = $state<boolean>(false);
+	count = $state(0);
+	lastTimePressed = $state(null);
+	hasBeenPressed = $state(false);
 
-	constructor(initialCount: number = 0) {
-		this.count = initialCount;
-	}
+	constructor(initialCount: number = 0)
+		@count = initialCount;
 
-	/* Increment the press count and update the last pressed timestamp */
-	press(): void {
-		this.count++;
-		this.lastTimePressed = new Date();
-		this.hasBeenPressed = true;
-	}
+	//  Increment the press count and update the last pressed timestamp 
+	press(): ->
+		@count++;
+		@lastTimePressed = new Date();
+		@hasBeenPressed = true;
 
-	/* Reset the counter back to zero */
-	reset(): void {
-		this.count = 0;
-		this.lastTimePressed = new Date();
-	}
 
-	/* Get a formatted message about the button state */
-	getMessage(): string {
-		if (!this.hasBeenPressed) {
+	// Broken when string?
+	// Get a formatted message about the button state 
+	getMessage(): string -> 
+		unless @hasBeenPressed
 			return 'Button has not been pressed yet';
-		}
-
 		return `Button pressed ${this.count} time${this.count === 1 ? '' : 's'}`;
-	}
 
 	/* Get a formatted timestamp of when the button was last pressed */
-	getLastTimePressedTime(): string {
-		if (!this.lastTimePressed) {
+	getLastTimePressedTime(): string ->
+		if @lastTimePressed = null
 			return 'Never pressed';
-		}
+		return @lastTimePressed.toLocaleString();
 
-		return this.lastTimePressed.toLocaleString();
-	}
-
-	hello() {
-		return 'Hello from Svelte!';
-	}
+	// Also broken
+	hello(): string ->
+		return 'Hello from Svelte!'
 }

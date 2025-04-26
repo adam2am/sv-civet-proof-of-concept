@@ -1,26 +1,25 @@
 <script lang="ts">
-	import { ImportedClass } from './class.svelte.ts';
-	const importedClass = new ImportedClass(0);
-	// yeap, that's all we need here
+	
+	import { ImportedClass23 } from './class.svelte.civet';
+	const importedClass = new ImportedClass23(0);
 </script>
 
 
 <div class="container">
 	<h1 class="title">Welcome to Svelte + SvelteKit</h1>
 	<p class="description">
-		The button tracking logic + $states are imported from <code>./class.svelte.ts</code>
+		The button tracking logic + $states are imported from <code>./class.svelte.CIVET</code>
 	</p>
 	<p class="description">which provides the functionality for the button below</p>
-	<p class="description">{importedClass.hello()}</p>
+
 
 	<div class="status-box">
 		<h2>Button Tracker Status</h2>
-		<p>Message: {importedClass.getMessage()}</p>
 		<p>Count: {importedClass.count}</p>
 		<p>Last Pressed: {importedClass.getLastTimePressedTime()}</p>
 		<button 
 			class="tracker-button" 
-			on:click={() => importedClass.performCheck()}>
+			on:click={() => importedClass.press()}>
 			Press Me
 		</button>
 	</div>

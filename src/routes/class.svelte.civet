@@ -1,39 +1,54 @@
-// src/routes/page-check.svelte.ts
-
-type PageCheck = {
-  message: string;
-  timestamp?: Date;
-  status?: 'pending' | 'completed' | 'failed';
+// src/routes/class.svelte.civet
+type classSchema = {
+  count: number;
+  lastTimePressed?: Date | null;
+  hasBeenPressed: boolean;
 }
 
-// State class for managing page check data using Svelte 5 runes
-export class PageCheckClass implements PageCheck {
-  // Apply $state to each property
-  message = $state<string>('');
-  timestamp = $state<Date | undefined>(undefined);
-  status = $state<'pending' | 'completed' | 'failed'>('pending');
 
-  constructor(message: string = 'Default page check message') {
-    this.message = message;
-    this.timestamp = new Date();
-  }
+/* A class to track button press state using Svelte 5 runes */
+export class ImportedClass23 implements classSchema {
+	// Track the number of times the button was pressed
+	count = $state<number>(0);
+	lastTimePressed = $state<Date | null>(null);
+	hasBeenPressed = $state<boolean>(false);
 
-  // Updates the message state
-  private setMessage(message: string): void {
-    this.message = message;
-  }
+	constructor(initialCount: number = 0) {
+		this.count = initialCount;
+	}
 
-  // Updates the status of the page check
-  public updateStatus(status: 'pending' | 'completed' | 'failed'): void {
-    this.status = status;
-    this.timestamp = new Date();
-  }
+	/* Increment the press count and update the last pressed timestamp */
+	press(): void {
+		this.count++;
+		this.lastTimePressed = new Date();
+		this.hasBeenPressed = true;
+	}
 
-  // Completes the page check with an optional result message
-  public completeCheck(resultMessage?: string): void {
-    if (resultMessage) {
-      this.setMessage(resultMessage);
-    }
-    this.updateStatus('completed');
-  }
+	/* Reset the counter back to zero */
+	reset(): void {
+		this.count = 0;
+		this.lastTimePressed = new Date();
+	}
+
+	/* Get a formatted message about the button state */
+	getMessage(): string {
+		if (!this.hasBeenPressed) {
+			return 'Button has not been pressed yet';
+		}
+
+		return `Button pressed ${this.count} time${this.count === 1 ? '' : 's'}`;
+	}
+
+	/* Get a formatted timestamp of when the button was last pressed */
+	getLastTimePressedTime(): string {
+		if (!this.lastTimePressed) {
+			return 'Never pressed';
+		}
+
+		return this.lastTimePressed.toLocaleString();
+	}
+
+	hello() {
+		return 'Hello from Svelte!';
+	}
 }

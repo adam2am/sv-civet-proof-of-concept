@@ -12,7 +12,8 @@
 	</p>
 	<p class="description">which provides the functionality for the button below</p>
 
-	
+
+	<!-- press function works, count state as well, but string function nopenot working? -->
 	<div class="status-box">
 		<h2>Button Tracker Status</h2>
 		<p>Count: {importedClass.count}</p>
@@ -22,7 +23,7 @@
 			on:click={() => importedClass.press()}>
 			Press Me
 		</button>
-		{importedClass.hello}
+		{importedClass.hello()}
 	</div>
 </div>
 

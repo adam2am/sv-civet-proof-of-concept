@@ -21,10 +21,13 @@ export class ImportedClass implements classSchema {
 		@lastTimePressed = new Date();
 		@hasBeenPressed = true;
 
+	hello()
+		return 'Hello from Svelte!'
+
 
 	// Broken when string?
 	// Get a formatted message about the button state 
-	getMessage(): string -> 
+	getMessage(): string ->
 		unless @hasBeenPressed
 			return 'Button has not been pressed yet';
 		return `Button pressed ${this.count} time${this.count === 1 ? '' : 's'}`;
@@ -35,7 +38,5 @@ export class ImportedClass implements classSchema {
 			return 'Never pressed';
 		return @lastTimePressed.toLocaleString();
 
-	// Also broken
-	hello(): string ->
-		return 'Hello from Svelte!'
+
 }

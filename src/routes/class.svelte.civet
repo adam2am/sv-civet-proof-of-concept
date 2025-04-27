@@ -9,14 +9,15 @@ type classSchema
 export class ImportedClass implements classSchema {
 	// Track the number of times the button was pressed
 	count = $state(0);
-	lastTimePressed = $state(null);
+	// Allow Date or null for this state
+	lastTimePressed = $state<Date | null>(null); 
 	hasBeenPressed = $state(false);
 
 	constructor(initialCount: number = 0)
 		@count = initialCount;
 
 	//  Increment the press count and update the last pressed timestamp 
-	press(): ->
+	press(): void 
 		@count++;
 		@lastTimePressed = new Date();
 		@hasBeenPressed = true;
@@ -24,19 +25,18 @@ export class ImportedClass implements classSchema {
 	hello()
 		return 'Hello from Svelte!'
 
+	/* Get a formatted timestamp of when the button was last pressed */
+	getLastTimePressedTime(): string
+		unless @lastTimePressed
+			return 'Never pressed';
+		return @lastTimePressed.toLocaleString();
 
 	// Broken when string?
-	// Get a formatted message about the button state 
-	getMessage(): string ->
+	getMessage(): string
 		unless @hasBeenPressed
 			return 'Button has not been pressed yet';
 		return `Button pressed ${this.count} time${this.count === 1 ? '' : 's'}`;
 
-	/* Get a formatted timestamp of when the button was last pressed */
-	getLastTimePressedTime(): string ->
-		if @lastTimePressed = null
-			return 'Never pressed';
-		return @lastTimePressed.toLocaleString();
 
 
 }

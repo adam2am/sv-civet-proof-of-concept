@@ -3,7 +3,7 @@ type classSchema
 	count: number
 	lastTimePressed: Date | null
 	hasBeenPressed: boolean
-
+	increment(): void
 
 /* A class to track button press state using Svelte 5 runes */
 export class ImportedClass implements classSchema {
@@ -33,6 +33,12 @@ export class ImportedClass implements classSchema {
 			return 'Button has not been pressed yet';
 		return `Button pressed ${this.count} time${this.count === 1 ? '' : 's'}`;
 
+	increment(): void
+		@count++;
+		console.log "Count increased to #{count}"
 
+	// Civet-style function with fat arrow and implicit return
+	// doubleValue = (x) => x * 2
+	
 
 }

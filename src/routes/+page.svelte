@@ -24,6 +24,7 @@
 			Press Me
 		</button>
 		{importedClass.hello()}
+		<p>{importedClass.getMessage()}</p>
 	</div>
 </div>
 

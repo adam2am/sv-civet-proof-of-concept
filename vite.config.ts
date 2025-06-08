@@ -2,16 +2,14 @@ import tailwindcss from '@tailwindcss/vite';
 import { svelteTesting } from '@testing-library/svelte/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
-import civetVitePlugin from '@danielx/civet/vite';
+import {civetman} from 'vite-plugin-civetman';
+import type { PluginOption } from 'vite';
 
 export default defineConfig({
 	plugins: [
-		civetVitePlugin({
-			outputExtension: '.svelte.js',
-			ts: 'esbuild'
-		}) as any,
 		tailwindcss(),
-		sveltekit()
+		sveltekit(),
+		civetman() as PluginOption
 	],
 	test: {
 		workspace: [

@@ -43,6 +43,6 @@
 		"vitest": "^3.0.0",
 		"svelte-preprocess-with-civet": "^6.0.36",
 		"civetman-fork": "^0.0.6",
-		"vite-plugin-civetman-fork": "2.2.1"
+		"vite-plugin-civetman-fork": "2.2.3"
 	}
 }

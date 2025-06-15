@@ -1,0 +1,8 @@
+{
+    "parseOptions": {
+        "coffeeIsnt": true,
+        "coffeeEq": true,
+        "coffeeBooleans": true,
+        "coffeeInterpolation": true
+    }
+}

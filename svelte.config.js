@@ -8,14 +8,18 @@ const config = {
 	// for more information about preprocessors
 	preprocess: sveltePreprocess({
 		// or just use sync:true, js true
-		civet: { sync: true, js: false },
+		civet: { 
+			sync: true, 
+			js: false, 
+			// parseOptions: {
+			// 	coffeeIsnt: true,
+			// 	coffeeEq: true,
+			// 	coffeeBooleans: true,
+			// 	coffeeInterpolation: true
+			// }
+		},
 		typescript: true
 	}),
-
-	// disable Svelte pre-bundling to avoid first-run parse errors
-	vitePlugin: {
-		prebundleSvelteLibraries: false
-	},
 
 	kit: {
 		// adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.

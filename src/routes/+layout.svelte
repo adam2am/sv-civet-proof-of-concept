@@ -1,7 +1,8 @@
-<script lang="ts">
+<script lang="civet">
 	import '../app.css';
-	
-	let { children } = $props();
+	// SvelteKit automatically passes the return value of `load` from
+	// `+layout.civet` here
+	{ children, data } .= $props()
 </script>
 
 {@render children()}

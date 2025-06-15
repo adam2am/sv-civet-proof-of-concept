@@ -9,7 +9,9 @@ export default defineConfig({
 	plugins: [
 		tailwindcss(),
 		sveltekit(),
-		civetman() as PluginOption
+		civetman({
+			vscodeHide: false
+		}) as PluginOption
 	],
 	test: {
 		workspace: [

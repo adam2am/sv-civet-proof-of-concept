@@ -1,0 +1,36 @@
+import type { User } from '$lib/types'
+
+type UserManagerType =
+	users: User[]
+	status: 'idle' | 'loading' | 'selected' | 'error'
+	selectedUserID: number | null
+
+// A reactive class to manage a list of users and their selection state.
+export class UserManager implements UserManagerType {
+	users = $state<User[]>([])
+	status = $state<'idle' | 'loading' | 'selected' | 'error'>('idle')
+	selectedUserID = $state<number | null>(null)
+
+	constructor(initialUsers: User[])
+		@users = initialUsers
+		@status = 'idle'
+		console.log "UserManager initialized with #{initialUsers.length} users."
+
+	selectedUser := $derived
+		if @selectedUserID isnt null
+			@users.find (user: User) => user.id is @selectedUserID
+		else
+			null as User | null
+
+	// A method in a class needs a name and a body.
+	// The body MUST be indented.
+	selectUser(id: number): void
+		@selectedUserID = id
+		@status = 'selected'
+
+	// Correct indentation is crucial in Civet.
+	clearSelection(): void
+		unless @selectedUserID is null
+			@selectedUserID = null
+			@status = 'idle'
+}

@@ -1,0 +1,39 @@
+import type { User } from '$lib/types'
+
+type RawUser
+	id: number
+	name: string
+	email: string
+	address: {
+		city: string
+		zipcode: string
+	}
+
+export async function load({ fetch }: { fetch: typeof globalThis.fetch }): Promise<{ users: User[] }>
+	try
+		console.log 'Loading layout data...'
+		// 🌟 Beautiful pipe operator for clean data flow
+		users := 'https://jsonplaceholder.typicode.com/users'
+			|> fetch
+			|> await
+			|> (response: Response) => 
+				if not response.ok
+					throw new Error("HTTP #{response.status}: #{response.statusText}")
+				response
+			|> .json()
+			|> await
+			|> .slice 0, 8 // for demo
+			|> .map (rawUser: RawUser) ->
+				// 🚀 object globs - extract only what you need
+				core := rawUser.{id, name, email}
+				location := rawUser.address.{city, zipcode}
+				{
+					...core, // 🚀 spread syntax
+					title: if core.email.includes('biz') then 'Manager' else 'Employee'
+					isActive: core.id % 3 isnt 0
+					location: "#{location.city} #{location.zipcode}"
+				}
+		{ users }
+	catch error
+		console.error 'Failed to load users:', error
+		{ users: [] }

@@ -10,7 +10,7 @@ export default defineConfig({
 		tailwindcss(),
 		sveltekit(),
 		civetman({
-			vscodeHide: false
+			vscodeHide: true
 		}) as PluginOption
 	],
 	test: {

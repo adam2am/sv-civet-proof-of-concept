@@ -1,0 +1,177 @@
+export showcaseData := [
+	{
+		title: '1. The Data Pipeline (+layout.civet)'
+		wowConcept: 'The Pipe Operator ( |> )'
+		explanation: "Used inside +layout.civet to fetch and transform data. 
+        The pipe operator turns a complex async chain into a readable shorter and clean chan in +layout.ts."
+		civetCode: `
+users := 'https://.../users'
+    |> fetch
+    |> await
+    |> (response) => 
+        if not response.ok
+            throw new Error('HTTP')
+        response
+    |> .json()
+    |> await
+    |> .slice 0, 8
+    |> .map (rawUser) ->
+        core := rawUser.{id, name, email}
+        location := rawUser.address.{city, zipcode}
+        {
+            ...core,
+            title: if core.email.includes('biz') 
+                   then 'Manager' else 'Employee'
+            isActive: core.id % 3 isnt 0
+            location: "#{location.city} #{location.zipcode}"
+        }
+`
+		tsCode: `
+const users = ((await ((response) => { 
+        if (!response.ok) {
+            throw new Error('HTTP')
+        }
+        return response
+    })(await fetch('https://.../users')).json()).slice(0, 8)).map(function(rawUser) {
+        const core = {id:rawUser.id, name:rawUser.name, email:rawUser.email}
+        let ref;const location = {city:(ref = rawUser.address).city, zipcode:ref.zipcode}
+        return ({
+            ...core,
+            title: (core.email.includes('biz')? 'Manager' : 'Employee'),
+            isActive: core.id % 3(isnt(0)),
+            location: "#{location.city} #{location.zipcode}"
+        })
+    });return users
+}
+`
+	},
+	{
+		title: '2. Reactive Superpowers (+page.svelte & classes)'
+		wowConcept: 'Pattern Matching in switch Expressions'
+		explanation: "Inside any component script (`lang=civet`) or reusable class you import, a `switch` can match an object's shape and values. 
+        Combine this with `$derived` for reactivity and you get declarative logic with essentially zero boilerplate."
+		civetCode: `
+statusMessage := $derived
+    if not selectedUser then switch status
+        'loading' then '⏳ Loading...'
+        'error' then '❌ Error'
+        else '👆 Select a user'
+    else switch selectedUser
+        {name, isActive: true} 
+            "🎉 #{name} is active!"
+        {name, isActive: false}
+            "😴 #{name} is away"
+`
+		tsCode: `
+const statusMessage = $derived(
+  (()=>{
+    if (!selectedUser) {
+      if(status === 'loading') {
+        return '⏳ Loading...'
+      } else if(status === 'error') {
+        return '❌ Error'
+      } else {
+        return '👆 Select a user'
+      }
+    }
+    else if(typeof selectedUser === 'object' && selectedUser != null && 'name' in selectedUser && 'isActive' in selectedUser && selectedUser.isActive === true) {
+      const { name } = selectedUser;
+      return \`🎉 \${name} is active!\`;
+    }
+    else if(typeof selectedUser === 'object' && selectedUser != null && 'name' in selectedUser && 'isActive' in selectedUser && selectedUser.isActive === false) {
+      const { name } = selectedUser;
+      return \`😴 \${name} is away\`;
+    }
+    return;
+  })()
+)
+`
+	},
+	{
+		title: '3. Implicit Returns'
+		wowConcept: 'Implicit Returns (->)'
+		explanation: "Functions implicitly return their last expression, eliminating `return` and braces. 
+        You can use this everywhere, from callbacks and event handlers to small utilities, eliminating boilerplate."
+		civetCode: `
+     // Civet – implicit return
+     isManager := (user: User) -> user.title.includes('Manager')
+`
+		tsCode: `
+     // TypeScript – verbose
+     const isManager = (user: User): boolean => {
+         return user.title.includes('Manager');
+     };
+`
+	},
+	{
+		title: '4. Elegant Abstractions'
+		wowConcept: '@ for this'
+		explanation: "The 'this' keyword in JavaScript is a common source of bugs and verbosity. 
+        Civet's @ alias, combined with indentation-based syntax, makes classes dramatically cleaner and easier to reason about."
+		civetCode: `
+class UserManager
+    users = $state []
+    selectedUserID = $state null
+
+    constructor(initialUsers)
+        @users = initialUsers
+
+    selectedUser := $derived
+        if @selectedUserID isnt null
+            @users.find (u) => 
+                u.id is @selectedUserID
+    
+    selectUser: (id) ->
+        @selectedUserID = id
+`
+		tsCode: `
+class UserManager {
+    users = $state([]);
+    selectedUserID = $state(null);
+
+    constructor(initialUsers) {
+        this.users = initialUsers;
+    }
+
+    get selectedUser() {
+        if (this.selectedUserID !== null) {
+            return this.users.find((u) => {
+                return u.id === this.selectedUserID;
+            });
+        }
+    }
+
+    selectUser(id) {
+        this.selectedUserID = id;
+    }
+}
+`
+	},
+	{
+		title: '5. $derived do Expressions (live filtering)'
+		wowConcept: '$derived(do)'
+		explanation: "Multi-line logic as an inline expression.
+        Here it powers the live filtering below, still reactive."
+		civetCode: `
+filteredUsers := $derived do
+    if not filterQuery then users
+    else
+        query := filterQuery.toLowerCase()
+        users.filter (u) =>
+            u.name.toLowerCase().includes(query) or
+            u.title.toLowerCase().includes(query)
+`
+		tsCode: `
+const filteredUsers = $derived((()=>{{
+    if (!filterQuery) { return users }
+    else {
+        const query = filterQuery.toLowerCase()
+        return users.filter((u) => {
+            return u.name.toLowerCase().includes(query) ||
+                   u.title.toLowerCase().includes(query)
+        })
+    }
+}})())
+`
+	}
+] 

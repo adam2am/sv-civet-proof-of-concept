@@ -24,8 +24,8 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # civetman:start - Managed by civetman. DO NOT EDIT THIS BLOCK.
+src/lib/showcase-data.ts
 src/lib/types.ts
-src/onlyfolder/divAttempt.ts
 src/routes/+layout.ts
 src/routes/class.svelte.ts
 # civetman:end - End of civetman managed block.

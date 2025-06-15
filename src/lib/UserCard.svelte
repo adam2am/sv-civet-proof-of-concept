@@ -1,19 +1,20 @@
 <script lang="civet">
 	import type { User } from './types'
 
-	// 🌟 TYPE SHORTHAND: Inline object type
-	{ user, position, onSelect, isSelected, badge }: {
+	// Type shorthand
+	{ user, position, onSelect, 
+	isSelected, badge }: {	
 		user: User
 		position?: number
 		onSelect: (id: number) => void
 		isSelected: boolean
 		badge: string
-	} .= $props()
+		} .= $props()
 
-	// 🌟 IMPLICIT APPLICATION: Clean function calls
+	// Clean function calls
 	handleClick := => onSelect user.id
 
-	// 🌟 CHAINED COMPARISONS & RANGES: Mathematical expressions
+	// Mathematical expressions
 	positionStyle := $derived
 		if not position then ''
 		else switch true
@@ -21,28 +22,32 @@
 			when position <= 6 then '🥈' 
 			else '🥉'
 
-	// 🌟 PROPERTY ACCESS SHORTHAND: Multiple ways to access
+	// PROPERTY ACCESS SHORTHAND: Multiple ways to access
 	initials := $derived user.name.split(' ').map(.charAt(0)).join('')
 
-	// 🌟 OBJECT GLOB: Extract multiple properties
-	{ name, title, isActive } := user
+	// Extract multiple properties
+	{ name, title, email, location } := user
 </script>
 
 <div 
 	class="user-card" 
 	class:selected={isSelected}
-	onclick={() => onSelect(user.id)}
+	onclick={handleClick}
+	onkeydown={e => e.key === 'Enter' && handleClick()}
+	role="button"
+	tabindex="0"
 >
 	<div class="badge-container">
 		{#if position}
-			<span class="position">#{position}</span>
+			<span class="position">#{position}{positionStyle}</span>
 		{/if}
 		<span class="badge">{badge}</span>
+		<span class="initials">{initials}</span>
 	</div>
-	<h3>{user.name}</h3>
-	<p class="title">{user.title}</p>
-	<p class="email">{user.email}</p>
-	<p class="location">{user.location}</p>
+	<h3>{name}</h3>
+	<p class="title">{title}</p>
+	<p class="email">{email}</p>
+	<p class="location">{location}</p>
 </div>
 
 <style>
@@ -84,6 +89,15 @@
 
 	.badge {
 		font-size: 1.25rem;
+	}
+
+	.initials {
+		background: #e2e8f0;
+		color: #4a5568;
+		padding: 0.25rem 0.5rem;
+		border-radius: 6px;
+		font-size: 0.875rem;
+		font-weight: 500;
 	}
 
 	h3 {

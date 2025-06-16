@@ -1,5 +1,14 @@
 export showcaseData := [
 	{
+		title: '0. Just Do It (Indent-based if)'
+		wowConcept: 'Indentation-driven if ‑ no braces, no then'
+		explanation: "Even the simplest conditions look cleaner in Civet. No curly braces, just indentation."
+		civetCode: `
+if 1 isnt 2
+    we do 10 pushups
+`
+	},
+	{
 		title: '1. The Data Pipeline (+layout.civet)'
 		wowConcept: 'The Pipe Operator ( |> )'
 		explanation: "Used inside +layout.civet to fetch and transform data. 
@@ -26,24 +35,6 @@ users := 'https://.../users'
             location: "#{location.city} #{location.zipcode}"
         }
 `
-		tsCode: `
-const users = ((await ((response) => { 
-        if (!response.ok) {
-            throw new Error('HTTP')
-        }
-        return response
-    })(await fetch('https://.../users')).json()).slice(0, 8)).map(function(rawUser) {
-        const core = {id:rawUser.id, name:rawUser.name, email:rawUser.email}
-        let ref;const location = {city:(ref = rawUser.address).city, zipcode:ref.zipcode}
-        return ({
-            ...core,
-            title: (core.email.includes('biz')? 'Manager' : 'Employee'),
-            isActive: core.id % 3(isnt(0)),
-            location: "#{location.city} #{location.zipcode}"
-        })
-    });return users
-}
-`
 	},
 	{
 		title: '2. Reactive Superpowers (+page.svelte & classes)'
@@ -62,30 +53,6 @@ statusMessage := $derived
         {name, isActive: false}
             "😴 #{name} is away"
 `
-		tsCode: `
-const statusMessage = $derived(
-  (()=>{
-    if (!selectedUser) {
-      if(status === 'loading') {
-        return '⏳ Loading...'
-      } else if(status === 'error') {
-        return '❌ Error'
-      } else {
-        return '👆 Select a user'
-      }
-    }
-    else if(typeof selectedUser === 'object' && selectedUser != null && 'name' in selectedUser && 'isActive' in selectedUser && selectedUser.isActive === true) {
-      const { name } = selectedUser;
-      return \`🎉 \${name} is active!\`;
-    }
-    else if(typeof selectedUser === 'object' && selectedUser != null && 'name' in selectedUser && 'isActive' in selectedUser && selectedUser.isActive === false) {
-      const { name } = selectedUser;
-      return \`😴 \${name} is away\`;
-    }
-    return;
-  })()
-)
-`
 	},
 	{
 		title: '3. Implicit Returns'
@@ -93,14 +60,8 @@ const statusMessage = $derived(
 		explanation: "Functions implicitly return their last expression, eliminating `return` and braces. 
         You can use this everywhere, from callbacks and event handlers to small utilities, eliminating boilerplate."
 		civetCode: `
-     // Civet – implicit return
-     isManager := (user: User) -> user.title.includes('Manager')
-`
-		tsCode: `
-     // TypeScript – verbose
-     const isManager = (user: User): boolean => {
-         return user.title.includes('Manager');
-     };
+// Civet – implicit return
+isManager := (user: User) -> user.title.includes('Manager')
 `
 	},
 	{
@@ -121,28 +82,8 @@ class UserManager
             @users.find (u) => 
                 u.id is @selectedUserID
     
-	selectUser(id: number)
-		@selectedUserID = id   
-`
-		tsCode: `
-class UserManager {
-    users = $state<User[]>([])
-    selectedUserID = $state<number | null>(null)
-
-    constructor(initialUsers: []) {
-        this.users = initialUsers
-    }
-
-    readonly selectedUser = $derived(
-        (this.selectedUserID !== null?
-            this.users.find((u) => { 
-                return u.id === this.selectedUserID
-            }):void 0))
-
-    selectUser(id: number) {
-        return this.selectedUserID = id
-    }   
-}
+    selectUser(id: number)
+        @selectedUserID = id   
 `
 	},
 	{
@@ -158,18 +99,6 @@ filteredUsers := $derived do
         users.filter (u) =>
             u.name.toLowerCase().includes(query) or
             u.title.toLowerCase().includes(query)
-`
-		tsCode: `
-const filteredUsers = $derived((()=>{{
-    if (!filterQuery) { return users }
-    else {
-        const query = filterQuery.toLowerCase()
-        return users.filter((u) => {
-            return u.name.toLowerCase().includes(query) ||
-                   u.title.toLowerCase().includes(query)
-        })
-    }
-}})())
 `
 	}
 ] 

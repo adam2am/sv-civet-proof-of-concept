@@ -1,121 +1,117 @@
 <script lang="civet">
 	import InteractiveSnippet from './InteractiveSnippet.svelte'
+	import { onMount } from 'svelte'
 
 	type Props =
 		title: string
 		wowConcept: string
 		explanation: string
 		civetCode: string
-		tsCode: string
 
-	{ title, wowConcept, explanation, civetCode, tsCode } .= $props()
+	{ title, wowConcept, explanation, civetCode } .= $props()
 
-	compiledTs .= $state<string>(tsCode)
+	compiledTs .= $state<string>('')
+	errorInfo .= $state<{ message: string, line: number, column: number } | null>(null)
+	civetError .= $state<{ message: string, line: number, column: number } | null>(null)
 
-	handleCompiled := (e: CustomEvent<string>) ->
-		compiledTs = e.detail
+	// Lazy-load Prettier only in the browser to keep bundle lighter
+	prettierRef .= $state<any>(null)
+	parserTsRef .= $state<any>(null)
+	parserEstreeRef .= $state<any>(null)
+
+	ensurePrettierLoaded := async ->
+		if prettierRef then return
+		prettierRef = await import('prettier/standalone')
+		parserTsRef = await import('prettier/plugins/typescript')
+		parserEstreeRef = await import('prettier/plugins/estree')
+
+	// Derived output that injects error indicator when errorInfo is present
+	displayTs := $derived do
+		if not errorInfo? or not compiledTs
+			compiledTs
+		else
+			lines := compiledTs.split('\n')
+			errLine := errorInfo.line
+			errCol := errorInfo.column
+			// Clamp line number to be inside the bounds of the (potentially stale) TS code
+			lineIndex := Math.max(0, Math.min(errLine - 1, lines.length))
+			indicator := `// ${' '.repeat(Math.max(0, errCol - 1))}^-- [L${errLine}:${errCol}] ${errorInfo.message}`
+			lines.splice(lineIndex + 1, 0, indicator)
+			lines.join('\n')
+
+	handleCompiled := async (e: CustomEvent<string>) ->
+		try
+			// Format the TypeScript with Prettier
+			await ensurePrettierLoaded()
+			formatted := await prettierRef.format(e.detail, {
+				parser: 'typescript',
+				plugins: [parserEstreeRef, parserTsRef],
+				semi: false,
+				singleQuote: true,
+				printWidth: 80
+			})
+			
+			compiledTs = formatted.trim()
+			errorInfo = null
+		catch err
+			// If Prettier fails, still show the unformatted TypeScript
+			compiledTs = e.detail
+			errorInfo = { message: (err as Error).message, line: 0, column: 0 }
+
+	handleCompileError := (e: CustomEvent<{ message: string, line: number, column: number }>) ->
+		// Civet compilation error
+		errorInfo = { message: e.detail.message, line: e.detail.line, column: e.detail.column }
+		civetError = { message: e.detail.message, line: e.detail.line, column: e.detail.column }
+
+	// Initial compilation
+	onMount async ->
+		// InteractiveSnippet will handle the initial compilation
+		// and trigger handleCompiled via the 'compiled' event
 </script>
 
-<div class="showcase-card">
-	<div class="header">
-		<h3 class="title">{title}</h3>
-		<p class="wow-concept">
-			<span class="highlight">Main Concept:</span> {wowConcept}
+<article class="card bg-gradient-to-br from-base-100 to-base-200 shadow-xl border border-primary/20 transition-all duration-300 hover:shadow-primary/20 hover:border-primary/40">
+	<header class="card-body border-b border-base-300">
+		<h3 class="card-title text-2xl">{title}</h3>
+		<p class="text-base-content/70">
+			<span class="font-semibold text-primary">Main Concept:</span> {wowConcept}
 		</p>
+	</header>
+
+	<div class="card-body py-6">
+		<p class="text-base-content/80">{explanation}</p>
 	</div>
-	<p class="explanation">{explanation}</p>
-	<div class="code-comparison">
-		<div class="code-block">
-			<h4>🐱 Civet</h4>
-			<InteractiveSnippet initialCode={civetCode} editable language="civet" on:compiled={handleCompiled} />
+
+	<div class="grid grid-cols-1 md:grid-cols-2 bg-base-300 gap-px rounded-b-2xl overflow-hidden">
+		<div class="flex flex-col flex-1">
+			<h4 class="py-2 px-6 flex items-center gap-2 text-base-content/80 text-sm bg-base-300 font-semibold">
+				🐱 Civet <span class="text-lg">✏️</span>
+			</h4>
+			<div class="flex-1">
+				<InteractiveSnippet
+					initialCode={civetCode}
+					editable
+					language="civet"
+					on:compiled={handleCompiled}
+					on:compileError={handleCompileError}
+				/>
+				{#if civetError}
+					<p class="text-error text-xs p-2">⚠️ L{civetError.line}:{civetError.column} {civetError.message}</p>
+				{/if}
+			</div>
 		</div>
-		<div class="code-block">
-			<h4>🔷 TypeScript</h4>
-			{#key compiledTs}
-				<InteractiveSnippet initialCode={compiledTs} language="typescript" />
-			{/key}
+
+		<div class="flex flex-col flex-1">
+			<h4 class="py-2 px-6 flex items-center gap-2 text-base-content/80 text-sm bg-base-300 font-semibold">
+				🔷 TypeScript <span class="text-lg">🔒</span>
+			</h4>
+			<div class={`flex-1 ${errorInfo ? 'bg-error/10' : ''}`}>
+				{#key displayTs}
+					<InteractiveSnippet
+						initialCode={displayTs}
+						language="typescript"
+					/>
+				{/key}
+			</div>
 		</div>
 	</div>
-</div>
-
-<style>
-	@import 'prismjs/themes/prism-tomorrow.css';
-	.showcase-card {
-		background: #fff;
-		border-radius: 16px;
-		border: 1px solid #e2e8f0;
-		overflow: hidden;
-		box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-		transition: box-shadow 0.3s ease;
-	}
-
-	.showcase-card:hover {
-		box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-	}
-
-	.header {
-		padding: 1.5rem;
-		border-bottom: 1px solid #e2e8f0;
-		background: #f8fafc;
-	}
-
-	.title {
-		font-size: 1.5rem;
-		font-weight: 600;
-		color: #1e293b;
-		margin: 0 0 0.5rem;
-	}
-
-	.wow-concept {
-		margin: 0;
-		font-size: 1rem;
-		color: #475569;
-	}
-
-	.highlight {
-		font-weight: 600;
-		color: #4f46e5;
-	}
-
-	.explanation {
-		padding: 1.5rem;
-		margin: 0;
-		font-size: 1rem;
-		line-height: 1.6;
-		color: #334155;
-	}
-
-	.code-comparison {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0;
-		background: #1e293b;
-		padding-top: 1rem;
-		border-top: 1px solid #e2e8f0;
-		min-height: 320px;
-	}
-
-	.code-block {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.code-block h4 {
-		padding: 0.5rem 1.5rem;
-		margin: 0;
-		color: #cbd5e1;
-		font-size: 1rem;
-		font-weight: 500;
-	}
-
-	/* Make the code blocks full-width on smaller screens */
-	@media (max-width: 900px) {
-		.code-comparison {
-			grid-template-columns: 1fr;
-		}
-
-		.code-block:first-child {
-			border-bottom: 2px solid #334155;
-		}
-	}
-</style> 
+</article> 

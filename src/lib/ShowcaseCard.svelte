@@ -1,4 +1,6 @@
 <script lang="civet">
+	import InteractiveSnippet from './InteractiveSnippet.svelte'
+
 	type Props =
 		title: string
 		wowConcept: string
@@ -8,19 +10,10 @@
 
 	{ title, wowConcept, explanation, civetCode, tsCode } .= $props()
 
-	// Import Svelte lifecycle
-	import { onMount } from 'svelte'
+	compiledTs .= $state<string>(tsCode)
 
-	// Load Prism.js for syntax highlighting once the component mounts
-	onMount async =>
-		// Dynamically import Prism core
-		Prism := await import('prismjs')
-		// Load only the languages we need (TypeScript & CoffeeScript - closest to Civet)
-		// @ts-expect-error: No type declarations required for runtime highlight
-		await import('prismjs/components/prism-typescript.js')
-		// @ts-expect-error: No type declarations required for runtime highlight
-		await import('prismjs/components/prism-coffeescript.js')
-		Prism.highlightAll()
+	handleCompiled := (e: CustomEvent<string>) ->
+		compiledTs = e.detail
 </script>
 
 <div class="showcase-card">
@@ -34,11 +27,13 @@
 	<div class="code-comparison">
 		<div class="code-block">
 			<h4>🐱 Civet</h4>
-			<pre class="language-coffeescript"><code class="language-coffeescript">{civetCode}</code></pre>
+			<InteractiveSnippet initialCode={civetCode} editable language="civet" on:compiled={handleCompiled} />
 		</div>
 		<div class="code-block">
 			<h4>🔷 TypeScript</h4>
-			<pre class="language-typescript"><code class="language-typescript">{tsCode}</code></pre>
+			{#key compiledTs}
+				<InteractiveSnippet initialCode={compiledTs} language="typescript" />
+			{/key}
 		</div>
 	</div>
 </div>
@@ -97,6 +92,7 @@
 		background: #1e293b;
 		padding-top: 1rem;
 		border-top: 1px solid #e2e8f0;
+		min-height: 320px;
 	}
 
 	.code-block {
@@ -110,19 +106,6 @@
 		color: #cbd5e1;
 		font-size: 1rem;
 		font-weight: 500;
-	}
-
-	.code-block pre {
-		margin: 0;
-		padding: 1.5rem;
-		background-color: #0f172a;
-		color: #e2e8f0;
-		overflow-x: auto;
-		font-family: 'Fira Code', monospace;
-		font-size: 0.875rem;
-		line-height: 1.5;
-		flex-grow: 1;
-		white-space: pre-wrap;
 	}
 
 	/* Make the code blocks full-width on smaller screens */

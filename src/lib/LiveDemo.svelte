@@ -5,10 +5,8 @@
 
 	{ users }: { users: User[] } .= $props()
 
-	// Local state for users
+
 	usersState .= $state<User[]>(users)
-	
-	// Initialize class-based state management
 	userManager := new UserManager(users)
 
 	// States

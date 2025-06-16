@@ -4,6 +4,7 @@
 	import LiveDemo from '$lib/LiveDemo.svelte'
 	import type { User } from '$lib/types'
 	import { showcaseData } from '$lib/showcase-data'
+	import CivetPlayground from '$lib/CivetPlayground.svelte'
 
 	{ data }: { data?: { users: User[] } } .= $props()
 </script>
@@ -30,6 +31,9 @@
 		<h2 class="live-demo-heading">👀 Live Demo</h2>
 		<LiveDemo users={data.users} />
 	{/if}
+
+	<h2 class="live-demo-heading">✏️ Live Civet Playground</h2>
+	<CivetPlayground />
 </div>
 
 <style>

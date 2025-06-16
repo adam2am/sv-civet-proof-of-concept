@@ -12,10 +12,7 @@ const config = {
 			sync: true, 
 			js: false, 
 			// parseOptions: {
-			// 	coffeeIsnt: true,
-			// 	coffeeEq: true,
-			// 	coffeeBooleans: true,
-			// 	coffeeInterpolation: true
+			// 	  now being picked up from civetconfig.json
 			// }
 		},
 		typescript: true

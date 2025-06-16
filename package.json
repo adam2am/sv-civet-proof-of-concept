@@ -38,7 +38,7 @@
 		"svelte": "^5.33.19",
 		"svelte-check": "^4.2.1",
 		"svelte-preprocess-with-civet": "6.0.38",
-		"vite-plugin-civetman-fork": "2.3.2",
+		"vite-plugin-civetman-fork": "2.3.3",
 		"tailwindcss": "^4.0.0",
 		"tsserver-civetman-navigation": "^1.0.0",
 		"typescript": "^5.0.0",

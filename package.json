@@ -37,13 +37,13 @@
 		"prismjs": "^1.30.0",
 		"svelte": "^5.33.19",
 		"svelte-check": "^4.2.1",
-		"svelte-preprocess-with-civet": "link:../../../.local/share/pnpm/global/5/node_modules/svelte-preprocess-with-civet",
+		"svelte-preprocess-with-civet": "6.0.38",
+		"vite-plugin-civetman-fork": "2.3.2",
 		"tailwindcss": "^4.0.0",
 		"tsserver-civetman-navigation": "^1.0.0",
 		"typescript": "^5.0.0",
 		"typescript-eslint": "^8.20.0",
 		"vite": "^6.2.6",
-		"vite-plugin-civetman-fork": "link:../../../.local/share/pnpm/global/5/node_modules/vite-plugin-civetman-fork",
 		"vitest": "^3.0.0"
 	},
 	"dependencies": {

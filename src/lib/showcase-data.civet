@@ -110,10 +110,10 @@ const statusMessage = $derived(
         Civet's @ alias, combined with indentation-based syntax, makes classes dramatically cleaner and easier to reason about."
 		civetCode: `
 class UserManager
-    users = $state []
-    selectedUserID = $state null
+    users = $state<User[]> []
+    selectedUserID = $state<number | null> null
 
-    constructor(initialUsers)
+    constructor(initialUsers: [])
         @users = initialUsers
 
     selectedUser := $derived
@@ -121,29 +121,27 @@ class UserManager
             @users.find (u) => 
                 u.id is @selectedUserID
     
-    selectUser: (id) ->
-        @selectedUserID = id
+	selectUser(id: number)
+		@selectedUserID = id   
 `
 		tsCode: `
 class UserManager {
-    users = $state([]);
-    selectedUserID = $state(null);
+    users = $state<User[]>([])
+    selectedUserID = $state<number | null>(null)
 
-    constructor(initialUsers) {
-        this.users = initialUsers;
+    constructor(initialUsers: []) {
+        this.users = initialUsers
     }
 
-    get selectedUser() {
-        if (this.selectedUserID !== null) {
-            return this.users.find((u) => {
-                return u.id === this.selectedUserID;
-            });
-        }
-    }
+    readonly selectedUser = $derived(
+        (this.selectedUserID !== null?
+            this.users.find((u) => { 
+                return u.id === this.selectedUserID
+            }):void 0))
 
-    selectUser(id) {
-        this.selectedUserID = id;
-    }
+    selectUser(id: number) {
+        return this.selectedUserID = id
+    }   
 }
 `
 	},

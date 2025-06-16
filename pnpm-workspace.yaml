@@ -1,3 +1,0 @@
-overrides:
-  vite-plugin-civetman-fork: link:../../../.local/share/pnpm/global/5/node_modules/vite-plugin-civetman-fork
-  svelte-preprocess-with-civet: link:../../../.local/share/pnpm/global/5/node_modules/svelte-preprocess-with-civet

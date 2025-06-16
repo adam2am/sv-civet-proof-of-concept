@@ -1,38 +1,63 @@
-# sv
+# Civet + Svelte 5 🚀 Proof-of-Concept
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Welcome to **sv-civet-proof-of-concept** – a tiny application that shows how the
+ **[Civet](https://github.com/DanielXMoore/Civet)** language pairs perfectly with the
+ **Svelte 5**.
 
-## Creating a project
+---
 
-If you're seeing this, you've probably already done this step. Congrats!
+## ✨ Key language features on display
 
-```bash
-# create a new project in the current directory
-npx sv create
+| Civet feature | Where to look | What it does |
+| ------------- | ------------ | ------------ |
+| Pipe operator `|>` | `src/routes/+layout.civet` | Streams async fetch → transformation steps with zero nesting. |
+| Object globs `.{foo,bar}` | `+layout.civet` | Extract only the props you need. |
+| Pattern-matching `switch` | `src/lib/LiveDemo.svelte` | Declaratively describe UI states without `if/else` ladders. |
+| Implicit returns `->` | `LiveDemo.svelte`, `UserCard.svelte` | Goodbye `return`; the last expression is enough. |
+| `$derived do` multi-line reactivity | `LiveDemo.svelte` | Compute reactive values with full block scope clarity. |
+| Math-style comparisons (`0 < x < 2`) | `LiveDemo.svelte` | Readably express numeric ranges. |
+| `@` alias for `this` | `src/routes/class.svelte.civet` | Remove the `this.` noise inside classes. |
 
-# create a new project in my-app
-npx sv create my-app
+---
+
+## 📂 Project tour
+
+```
+src/
+├── lib/
+│   ├── LiveDemo.svelte      ← Interactive user list (Civet)
+│   ├── ShowcaseCard.svelte  ← Civet vs TypeScript code diff viewer
+│   ├── UserCard.svelte      ← Small, expressive card component
+│   ├── showcase-data.civet  ← Data that powers the comparison cards
+│   └── types.civet          ← Shared `User` type
+├── routes/
+│   ├── +layout.civet        ← Loads data using Civet features
+│   ├── +layout.svelte       ← Passes data to children
+│   ├── +page.svelte         ← Home page wiring everything together
+│   └── class.svelte.civet   ← Reactive `UserManager` class
+└── …
 ```
 
-## Developing
+---
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## ⚡ Getting started
 
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
+1. Install dependencies (*PNPM is recommended but not required*):
 
 ```bash
-npm run build
+pnpm install    # or `npm install`, `bun install`
 ```
 
-You can preview the production build with `npm run preview`.
+2. Start the development server:
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```bash
+pnpm dev        # default: http://localhost:5173
+```
+
+3. Build and preview a production bundle:
+
+```bash
+pnpm build
+pnpm preview    # serves the ./build output
+```
+

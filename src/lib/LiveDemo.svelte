@@ -1,11 +1,9 @@
 <script lang="civet">
-	import UserCard from '$lib/UserCard.svelte'
-	import { UserManager } from '../routes/class.svelte'
-	import type { User } from '$lib/types'
+	UserCard from '$lib/UserCard.svelte'
+	type { User } from '$lib/types'
+	{ UserManager } from '../routes/class.svelte'
 
 	{ users }: { users: User[] } .= $props()
-
-
 	usersState .= $state<User[]>(users)
 	userManager := new UserManager(users)
 
@@ -126,7 +124,7 @@
 <div class="status-card">
 	<p class="status-message">{statusMessage}</p>
 	<div class="stats">
-		<span>📊 {userStats.summary}</span>
+		<span>📊 {userStats.summary}</span> 
 		<span>🎯 Showing: {sortedUsers.length}</span>
 		{#if userManager.selectedUser}
 			<span>👤 Selected: {getUserDisplayName(userManager.selectedUser)}</span>

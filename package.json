@@ -26,6 +26,7 @@
 		"@tailwindcss/vite": "^4.0.0",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@testing-library/svelte": "^5.2.4",
+		"@types/prismjs": "^1.26.5",
 		"autoprefixer": "^10.4.21",
 		"daisyui": "^5.0.43",
 		"eslint": "^9.18.0",
@@ -40,16 +41,13 @@
 		"prismjs": "^1.30.0",
 		"svelte": "^5.33.19",
 		"svelte-check": "^4.2.1",
-		"svelte-preprocess-with-civet": "6.0.38",
 		"tailwindcss": "^4.0.0",
 		"tsserver-civetman-navigation": "^1.0.0",
 		"typescript": "^5.0.0",
 		"typescript-eslint": "^8.20.0",
 		"vite": "^6.2.6",
 		"vite-plugin-civetman-fork": "2.3.3",
-		"vitest": "^3.0.0"
-	},
-	"dependencies": {
-		"@types/prismjs": "^1.26.5"
+		"vitest": "^3.0.0",
+		"svelte-preprocess-with-civet": "6.0.40"
 	}
 }

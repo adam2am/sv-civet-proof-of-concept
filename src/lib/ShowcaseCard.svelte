@@ -1,6 +1,6 @@
 <script lang="civet">
 	import InteractiveSnippet from './InteractiveSnippet.svelte'
-	import { onMount } from 'svelte'
+	import { onMount, tick } from 'svelte'
 
 	type Props =
 		title: string
@@ -13,6 +13,7 @@
 	compiledTs .= $state<string>('')
 	errorInfo .= $state<{ message: string, line: number, column: number } | null>(null)
 	civetError .= $state<{ message: string, line: number, column: number } | null>(null)
+	snippetsVisible .= $state(false)
 
 	// Lazy-load Prettier only in the browser to keep bundle lighter
 	prettierRef .= $state<any>(null)
@@ -57,11 +58,17 @@
 			// If Prettier fails, still show the unformatted TypeScript
 			compiledTs = e.detail
 			errorInfo = { message: (err as Error).message, line: 0, column: 0 }
+		
+		await tick()
+		snippetsVisible = true
 
-	handleCompileError := (e: CustomEvent<{ message: string, line: number, column: number }>) ->
+	handleCompileError := async (e: CustomEvent<{ message: string, line: number, column: number }>) ->
 		// Civet compilation error
 		errorInfo = { message: e.detail.message, line: e.detail.line, column: e.detail.column }
 		civetError = { message: e.detail.message, line: e.detail.line, column: e.detail.column }
+
+		await tick()
+		snippetsVisible = true
 
 	// Initial compilation
 	onMount async ->
@@ -81,16 +88,18 @@
 		<p class="text-base-content/80">{explanation}</p>
 	</div>
 
-	<div class="grid grid-cols-1 md:grid-cols-2 bg-base-300 gap-px rounded-b-2xl overflow-hidden">
+	<div class="grid grid-cols-1 md:grid-cols-2 bg-[#1e293b] gap-px rounded-b-2xl overflow-hidden">
 		<div class="flex flex-col flex-1">
-			<h4 class="py-2 px-6 flex items-center gap-2 text-base-content/80 text-sm bg-base-300 font-semibold">
+			<h4 class="py-2 px-6 flex items-center gap-2 text-[#e2e8f0] text-sm bg-[#1e293b] font-semibold">
 				🐱 Civet <span class="text-lg">✏️</span>
+				<span class="text-xs text-sky-100">(editable)</span>
 			</h4>
 			<div class="flex-1">
 				<InteractiveSnippet
 					initialCode={civetCode}
 					editable
 					language="civet"
+					reveal={snippetsVisible}
 					on:compiled={handleCompiled}
 					on:compileError={handleCompileError}
 				/>
@@ -101,14 +110,16 @@
 		</div>
 
 		<div class="flex flex-col flex-1">
-			<h4 class="py-2 px-6 flex items-center gap-2 text-base-content/80 text-sm bg-base-300 font-semibold">
+			<h4 class="py-2 px-6 flex items-center gap-2 text-[#e2e8f0] text-sm bg-[#1e293b] font-semibold">
 				🔷 TypeScript <span class="text-lg">🔒</span>
+				<span class="text-xs text-slate-400">(compiled output)</span>
 			</h4>
 			<div class={`flex-1 ${errorInfo ? 'bg-error/10' : ''}`}>
 				{#key displayTs}
 					<InteractiveSnippet
 						initialCode={displayTs}
 						language="typescript"
+						reveal={snippetsVisible}
 					/>
 				{/key}
 			</div>

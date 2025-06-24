@@ -6,17 +6,7 @@ import { sveltePreprocess } from 'svelte-preprocess-with-civet';
 const config = {
 	// Consult https://svelte.dev/docs/kit/integrations
 	// for more information about preprocessors
-	preprocess: sveltePreprocess({
-		// or just use sync:true, js true
-		civet: { 
-			sync: true, 
-			js: false, 
-			// parseOptions: {
-			// 	  now being picked up from civetconfig.json
-			// }
-		},
-		typescript: true
-	}),
+	preprocess: sveltePreprocess({}),
 
 	kit: {
 		// adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.

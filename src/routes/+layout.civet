@@ -9,7 +9,7 @@ type RawUser
 		zipcode: string
 	}
 
-export async function load({ fetch }: { fetch: typeof globalThis.fetch }): Promise<{ users: User[] }>
+async function getUsers(fetch: typeof globalThis.fetch): Promise<User[]>
 	try
 		console.log 'Loading layout data...'
 		// 🌟 Beautiful pipe operator for clean data flow
@@ -33,7 +33,14 @@ export async function load({ fetch }: { fetch: typeof globalThis.fetch }): Promi
 					isActive: core.id % 3 isnt 0
 					location: "#{location.city} #{location.zipcode}"
 				}
-		{ users }
+		return users
 	catch error
 		console.error 'Failed to load users:', error
-		{ users: [] }
+		throw error // Re-throw to be caught by #await
+
+export load := ({ fetch }: { fetch: typeof globalThis.fetch }) ->
+	{
+		streamed: {
+			users: getUsers(fetch)
+		}
+	}

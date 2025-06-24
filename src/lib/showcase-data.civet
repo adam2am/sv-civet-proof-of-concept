@@ -6,6 +6,9 @@ export showcaseData := [
 		civetCode: `
 if 1 isnt 2
     we do 10 pushups
+
+weSwitch := (we:string) ->
+  we = if we is we then us else we
 `
 	},
 	{

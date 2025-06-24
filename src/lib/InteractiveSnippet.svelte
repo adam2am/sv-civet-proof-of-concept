@@ -7,12 +7,13 @@
 	import 'prismjs/themes/prism-tomorrow.css'
 
 	// Props
-	{ initialCode, language = 'civet', editable = false } := $props<{ initialCode: string, language?: 'civet' | 'typescript', editable?: boolean }>()
+	{ initialCode, language = 'civet', editable = false, reveal = true } := $props<{ initialCode: string, language?: 'civet' | 'typescript', editable?: boolean, reveal?: boolean }>()
 
 	// State
 	codeState .= $state<string>(initialCode.startsWith('\n') ? initialCode.slice(1) : initialCode)
 	textareaRef .= $state<HTMLTextAreaElement | null>(null)
 	preRef .= $state<HTMLPreElement | null>(null)
+	isMounted .= $state(false)
 	dispatch := createEventDispatcher<{ compiled: string, compileError: { message: string, line: number, column: number } }>()
 
 	// Compile options
@@ -76,6 +77,14 @@
 		updateHighlight()
 		await compileNow()
 
+	revealSnippet := async -> 
+		await tick()
+		isMounted = true
+
+	$effect ->
+		if reveal and not isMounted
+			void revealSnippet()
+
 	// Re-compile and re-highlight when code changes, then sync scroll
 	$effect ->
 		codeState
@@ -101,23 +110,31 @@
 	// Adjust style maybe keep but fine.
 </script>
 
-<div class="relative h-full bg-[#0f172a] font-mono">
-	{#if editable}
-		<textarea
-			bind:this={textareaRef}
-			bind:value={codeState}
-			onkeydown={handleKeydown}
-			spellcheck="false"
-			autocomplete="off"
-			class="absolute inset-0 w-full h-full p-6 text-sm bg-transparent text-transparent caret-primary focus:outline-none resize-none overflow-auto whitespace-pre-wrap break-words selection:bg-primary/30 selection:text-[#e2e8f0] z-10"
-			style="color:transparent; -webkit-text-fill-color:transparent;"
-		></textarea>
-	{/if}
-	<pre
-		bind:this={preRef}
-		class="w-full h-full m-0 p-6 text-sm text-[#e2e8f0] overflow-auto !bg-[#0f172a] pointer-events-none whitespace-pre-wrap break-words">
-		<code>{@html Prism.highlight(codeState, language === 'civet' ? Prism.languages.coffeescript : Prism.languages.typescript, language === 'civet' ? 'coffeescript' : 'typescript')}</code>
-	</pre>
+<div class="relative h-full min-h-[14rem] bg-[#0f172a] font-mono">
+	<!-- Spinner: centered and visible when not mounted -->
+	<div class="absolute inset-0 flex items-center justify-center transition-opacity" class:opacity-0={isMounted}>
+		<span class="loading loading-spinner text-primary"></span>
+	</div>
+
+	<!-- Code Content: hidden until mounted -->
+	<div class="w-full h-full transition-opacity" class:opacity-0={!isMounted}>
+		{#if editable}
+			<textarea
+				bind:this={textareaRef}
+				bind:value={codeState}
+				onkeydown={handleKeydown}
+				spellcheck="false"
+				autocomplete="off"
+				class="absolute inset-0 w-full h-full p-6 text-sm bg-transparent text-transparent caret-primary focus:outline-none resize-none overflow-auto whitespace-pre-wrap break-words selection:bg-primary/30 selection:text-[#e2e8f0] z-10"
+				style="color:transparent; -webkit-text-fill-color:transparent;"
+			></textarea>
+		{/if}
+		<pre
+			bind:this={preRef}
+			class="w-full h-full m-0 p-6 text-sm text-[#e2e8f0] overflow-auto !bg-transparent pointer-events-none whitespace-pre-wrap break-words">
+			<code>{@html Prism.highlight(codeState, language === 'civet' ? Prism.languages.coffeescript : Prism.languages.typescript, language === 'civet' ? 'coffeescript' : 'typescript')}</code>
+		</pre>
+	</div>
 </div>
 
 <style>

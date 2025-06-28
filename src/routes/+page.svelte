@@ -1,3 +1,11 @@
+<script module lang="civet">
+	abc .= $state(1)
+	string := $derived "#{abc}"
+	stringArray := $derived 
+		["#{abc}", 
+		"b", 
+		"c"]
+</script>
 <script lang="civet">
 	'../app.css'
 	{ showcaseData } from '$lib/showcase-data'
@@ -5,16 +13,17 @@
 	LiveDemo from '$lib/LiveDemo.svelte'
 	type { User } from '$lib/types'
 	CivetPlayground from '$lib/CivetPlayground.svelte'
-	
 	{ data }: { data: { streamed: { users: Promise<User[]> } } } .= $props()
 </script>
 
+{string} 
+{stringArray}
 <main class="container mx-auto p-8 md:p-16 flex flex-col gap-20">
 	<header class="text-center mb-8">
 		<h1 class="text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-info to-primary bg-clip-text text-transparent mb-2">
 			✨ Civet & TypeScript
 		</h1>
-		<p class="text-xl text-base-content/70 mb-4">A Developer Experience Showcase</p>
+		<p class="text-xl text-base-content/70 mb-4">A Developer Experience Showcase.</p>
 		<div class="flex justify-center gap-4">
 			<span class="badge badge-outline badge-lg text-primary gap-1">🐱 Civet</span>
 			<span class="badge badge-outline badge-lg text-secondary gap-1">🔥 Svelte 5</span>

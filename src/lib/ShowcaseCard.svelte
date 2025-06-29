@@ -40,11 +40,11 @@
 			lines.splice(lineIndex + 1, 0, indicator)
 			lines.join('\n')
 
-	handleCompiled := async (e: CustomEvent<string>) ->
+	handleCompiled := async (compiledCode: string) ->
 		try
 			// Format the TypeScript with Prettier
 			await ensurePrettierLoaded()
-			formatted := await prettierRef.format(e.detail, {
+			formatted := await prettierRef.format(compiledCode, {
 				parser: 'typescript',
 				plugins: [parserEstreeRef, parserTsRef],
 				semi: false,
@@ -56,16 +56,16 @@
 			errorInfo = null
 		catch err
 			// If Prettier fails, still show the unformatted TypeScript
-			compiledTs = e.detail
+			compiledTs = compiledCode
 			errorInfo = { message: (err as Error).message, line: 0, column: 0 }
 		
 		await tick()
 		snippetsVisible = true
 
-	handleCompileError := async (e: CustomEvent<{ message: string, line: number, column: number }>) ->
+	handleCompileError := async (err: { message: string, line: number, column: number }) ->
 		// Civet compilation error
-		errorInfo = { message: e.detail.message, line: e.detail.line, column: e.detail.column }
-		civetError = { message: e.detail.message, line: e.detail.line, column: e.detail.column }
+		errorInfo = { message: err.message, line: err.line, column: err.column }
+		civetError = { message: err.message, line: err.line, column: err.column }
 
 		await tick()
 		snippetsVisible = true
@@ -100,8 +100,8 @@
 					editable
 					language="civet"
 					reveal={snippetsVisible}
-					on:compiled={handleCompiled}
-					on:compileError={handleCompileError}
+					onCompiled={handleCompiled}
+					onCompileError={handleCompileError}
 				/>
 				{#if civetError}
 					<p class="text-error text-xs p-2">⚠️ L{civetError.line}:{civetError.column} {civetError.message}</p>

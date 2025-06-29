@@ -1,5 +1,5 @@
 <script lang="civet">
-	import { onMount, createEventDispatcher, tick } from 'svelte'
+	import { onMount, tick } from 'svelte'
 	import { compile } from '@danielx/civet'
 	import Prism from 'prismjs'
 	import 'prismjs/components/prism-typescript'
@@ -7,14 +7,20 @@
 	import 'prismjs/themes/prism-tomorrow.css'
 
 	// Props
-	{ initialCode, language = 'civet', editable = false, reveal = true } := $props<{ initialCode: string, language?: 'civet' | 'typescript', editable?: boolean, reveal?: boolean }>()
+	{ initialCode, language = 'civet', editable = false, reveal = true, onCompiled, onCompileError } := $props<{ 
+		initialCode: string, 
+		language?: 'civet' | 'typescript', 
+		editable?: boolean, 
+		reveal?: boolean,
+		onCompiled?: (compiled: string) => void,
+		onCompileError?: (error: { message: string, line: number, column: number }) => void
+	}>()
 
 	// State
 	codeState .= $state<string>(initialCode.startsWith('\n') ? initialCode.slice(1) : initialCode)
 	textareaRef .= $state<HTMLTextAreaElement | null>(null)
 	preRef .= $state<HTMLPreElement | null>(null)
 	isMounted .= $state(false)
-	dispatch := createEventDispatcher<{ compiled: string, compileError: { message: string, line: number, column: number } }>()
 
 	// Compile options
 	compileOpts := {
@@ -32,17 +38,17 @@
 		if language is 'civet'
 			try
 				compiled := await compile(codeState, compileOpts) as string
-				dispatch 'compiled', compiled
+				onCompiled?.(compiled)
 			catch err
-				// Dispatch compileError event with trimmed message
+				// Handle compile error with trimmed message
 				rawMsg := (err as Error).message
 				// Remove the lengthy 'Expected:' block
 				trimmedMsg := rawMsg.split('Expected:')[0].trim()
-				dispatch 'compileError', {
+				onCompileError?.({
 					message: trimmedMsg,
 					line: (err as any).line ?? 0,
 					column: (err as any).column ?? 0
-				}
+				})
 
 	// Update the editor's innerHTML with highlighted code
 	updateHighlight := ->

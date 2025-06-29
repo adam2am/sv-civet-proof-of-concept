@@ -27,18 +27,7 @@
 		parserEstreeRef = await import('prettier/plugins/estree')
 
 	// Derived output that injects error indicator when errorInfo is present
-	displayTs := $derived do
-		if not errorInfo? or not compiledTs
-			compiledTs
-		else
-			lines := compiledTs.split('\n')
-			errLine := errorInfo.line
-			errCol := errorInfo.column
-			// Clamp line number to be inside the bounds of the (potentially stale) TS code
-			lineIndex := Math.max(0, Math.min(errLine - 1, lines.length))
-			indicator := `// ${' '.repeat(Math.max(0, errCol - 1))}^-- [L${errLine}:${errCol}] ${errorInfo.message}`
-			lines.splice(lineIndex + 1, 0, indicator)
-			lines.join('\n')
+	displayTs := $derived compiledTs
 
 	handleCompiled := async (compiledCode: string) ->
 		try
@@ -62,10 +51,10 @@
 		await tick()
 		snippetsVisible = true
 
-	handleCompileError := async (err: { message: string, line: number, column: number }) ->
+	handleCompileError := async (err?: { message: string, line: number, column: number }) ->
 		// Civet compilation error
-		errorInfo = { message: err.message, line: err.line, column: err.column }
-		civetError = { message: err.message, line: err.line, column: err.column }
+		errorInfo = err ?? null
+		civetError = err ?? null
 
 		await tick()
 		snippetsVisible = true
@@ -102,6 +91,7 @@
 					reveal={snippetsVisible}
 					onCompiled={handleCompiled}
 					onCompileError={handleCompileError}
+					errorInfo={civetError ?? undefined}
 				/>
 				{#if civetError}
 					<p class="text-error text-xs p-2">⚠️ L{civetError.line}:{civetError.column} {civetError.message}</p>

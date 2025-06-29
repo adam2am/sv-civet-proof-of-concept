@@ -7,13 +7,14 @@
 	import 'prismjs/themes/prism-tomorrow.css'
 
 	// Props
-	{ initialCode, language = 'civet', editable = false, reveal = true, onCompiled, onCompileError } := $props<{ 
+	{ initialCode, language = 'civet', editable = false, reveal = true, onCompiled, onCompileError, errorInfo } := $props<{ 
 		initialCode: string, 
 		language?: 'civet' | 'typescript', 
 		editable?: boolean, 
 		reveal?: boolean,
 		onCompiled?: (compiled: string) => void,
-		onCompileError?: (error: { message: string, line: number, column: number }) => void
+		onCompileError?: (error: { message: string, line: number, column: number }) => void,
+		errorInfo?: { message: string, line: number, column: number }
 	}>()
 
 	// State
@@ -39,23 +40,38 @@
 			try
 				compiled := await compile(codeState, compileOpts) as string
 				onCompiled?.(compiled)
+				// Clear error state immediately on success
+				onCompileError?.(undefined)
 			catch err
 				// Handle compile error with trimmed message
 				rawMsg := (err as Error).message
 				// Remove the lengthy 'Expected:' block
 				trimmedMsg := rawMsg.split('Expected:')[0].trim()
-				onCompileError?.({
-					message: trimmedMsg,
-					line: (err as any).line ?? 0,
-					column: (err as any).column ?? 0
-				})
+				// Debounce error updates
+				setTimeout(
+					=> onCompileError?.({
+						message: trimmedMsg,
+						line: (err as any).line ?? 0,
+						column: (err as any).column ?? 0
+					}),
+					150
+				)
 
 	// Update the editor's innerHTML with highlighted code
 	updateHighlight := ->
 		if not preRef return
+		// Determine display text (add error indicator for Civet)
+		displayCode .= codeState
+		if language is 'civet' and errorInfo?
+			lines := codeState.split('\n')
+			// Ensure line index is within bounds (compiler uses 1-based)
+			lineIndex := Math.max(0, Math.min(errorInfo.line - 1, lines.length))
+			indicator := "// #{' '.repeat(Math.max(0, errorInfo.column - 1))}^-- [L#{errorInfo.line}:#{errorInfo.column}] #{errorInfo.message}"
+			lines.splice(lineIndex + 1, 0, indicator)
+			displayCode = lines.join('\n')
 		prismLang := if language is 'civet' then Prism.languages.coffeescript else Prism.languages.typescript
 		alias := if language is 'civet' then 'coffeescript' else 'typescript'
-		highlighted := Prism.highlight(codeState, prismLang, alias)
+		highlighted := Prism.highlight(displayCode, prismLang, alias)
 		if preRef.innerHTML isnt highlighted
 			preRef.innerHTML = highlighted
 
@@ -94,7 +110,9 @@
 	// Re-compile and re-highlight when code changes, then sync scroll
 	$effect ->
 		codeState
-		updateHighlight()
+		errorInfo
+		// Debounce highlighting updates
+		timerId := setTimeout(updateHighlight, 50)
 		if language is 'civet'
 			void compileNow()
 
@@ -110,6 +128,7 @@
 		->
 			ta.removeEventListener 'scroll', sync
 			ta.removeEventListener 'input', sync
+			clearTimeout timerId
 
 	// No longer needed as textarea binding updates codeState automatically
 

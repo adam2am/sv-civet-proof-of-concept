@@ -112,27 +112,23 @@
 
 		-> ta.removeEventListener('scroll', syncScroll)
 
-
-	// 		if 1 isnt 2
-	//   then we do 10 pushups
-
 	// Handle Tab and Shift+Tab for indentation
 	handleKeydown := (e: KeyboardEvent) ->
 		if e.key is 'Tab'
 			e.preventDefault()
 			
-			const ta = e.currentTarget as HTMLTextAreaElement
-			const start = ta.selectionStart
-			const end = ta.selectionEnd
-			const value = ta.value
-			const tab = '  ' // 2 spaces for indentation
+			ta := e.currentTarget as HTMLTextAreaElement
+			start := ta.selectionStart
+			end := ta.selectionEnd
+			value := ta.value
+			tab := '  ' // 2 spaces for indentation
 
 			if e.shiftKey
 				// Outdent: find the start of the line and remove a tab if present
-				const lineStart = value.lastIndexOf('\n', start - 1) + 1
+				lineStart := value.lastIndexOf('\n', start - 1) + 1
 				if value.substring(lineStart, lineStart + tab.length) === tab
 					ta.value = value.substring(0, lineStart) + value.substring(lineStart + tab.length)
-					const newPos = Math.max(lineStart, start - tab.length)
+					newPos := Math.max(lineStart, start - tab.length)
 					ta.selectionStart = ta.selectionEnd = newPos
 				
 			else
